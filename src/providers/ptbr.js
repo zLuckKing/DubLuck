@@ -218,8 +218,3 @@ async function getPtBrStreams(type, id, qualityFilter = []) {
 }
 
 module.exports = { getPtBrStreams, detectQuality };
-```
-
-**Ctrl+S** para salvar! Depois abre o `index.js`:
-```
-code src/index.js
