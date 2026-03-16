@@ -24,10 +24,10 @@ app.get('/:config/manifest.json', (req, res) => {
   const config = decodeConfig(req.params.config);
   res.json({
     id: 'br.dubluck.stremio',
-    version: '2.2.0',
+    version: '2.3.0',
     name: '🍀 DubLuck',
     description: `Filmes e séries dublados em PT-BR com suporte a ${config.service !== 'none' ? config.service : 'Torrent direto'}.`,
-    logo: 'https://cdn.jsdelivr.net/npm/twemoji@14.0.2/assets/72x72/1f340.png',
+    logo: 'https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f340.png',
     resources: ['stream'],
     types: ['movie', 'series'],
     idPrefixes: ['tt'],
@@ -82,7 +82,12 @@ app.get('/:config/stream/:type/:id.json', async (req, res) => {
 });
 
 function buildMagnet(infoHash, name = '') {
-  const tr = ['udp://open.demonii.com:1337/announce','udp://tracker.openbittorrent.com:80','udp://tracker.opentrackr.org:1337/announce','udp://p4p.arenabg.com:1337'].map(t => `&tr=${encodeURIComponent(t)}`).join('');
+  const tr = [
+    'udp://open.demonii.com:1337/announce',
+    'udp://tracker.openbittorrent.com:80',
+    'udp://tracker.opentrackr.org:1337/announce',
+    'udp://p4p.arenabg.com:1337',
+  ].map(t => `&tr=${encodeURIComponent(t)}`).join('');
   return `magnet:?xt=urn:btih:${infoHash}&dn=${encodeURIComponent(name)}${tr}`;
 }
 
@@ -95,5 +100,16 @@ function formatTitle(stream) {
   return parts.filter(Boolean).join('\n');
 }
 
-app.listen(PORT, () => console.log(`🍀 DubLuck v2.2 rodando na porta ${PORT}`));
+app.listen(PORT, () => console.log(`🍀 DubLuck v2.3 rodando na porta ${PORT}`));
 module.exports = app;
+```
+
+**Ctrl+S** para salvar! Depois manda os 3 comandos no terminal:
+```
+git add .
+```
+```
+git commit -m "DubLuck v2.3 - mais fontes e logo corrigida"
+```
+```
+git push origin HEAD:main --force
