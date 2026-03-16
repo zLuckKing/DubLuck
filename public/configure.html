@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DubLuck — Configurar Addon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #080c10;
+      --surface: #0f1419;
+      --surface2: #161d26;
+      --border: rgba(255,255,255,0.07);
+      --accent: #00e5a0;
+      --accent2: #00b8ff;
+      --accent-glow: rgba(0, 229, 160, 0.15);
+      --text: #e8f0f8;
+      --text-muted: #5a7080;
+      --danger: #ff4757;
+      --warning: #ffa502;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Background atmosphere */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 80% 10%, rgba(0, 229, 160, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 50% at 20% 80%, rgba(0, 184, 255, 0.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Noise texture */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 52px;
+      animation: fadeDown 0.6s ease both;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo-icon {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 30px var(--accent-glow), 0 0 60px rgba(0,229,160,0.08);
+    }
+
+    .logo-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 30%, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .tagline {
+      font-size: 15px;
+      color: var(--text-muted);
+      font-weight: 300;
+      letter-spacing: 0.3px;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 16px;
+      animation: fadeUp 0.5s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+
+    .card:nth-child(2) { animation-delay: 0.1s; }
+    .card:nth-child(3) { animation-delay: 0.2s; }
+    .card:nth-child(4) { animation-delay: 0.3s; }
+
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title span {
+      width: 20px;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Service selector */
+    .service-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .service-option {
+      display: none;
+    }
+
+    .service-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--surface2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-label:hover {
+      border-color: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .service-option:checked + .service-label {
+      border-color: var(--accent);
+      background: rgba(0, 229, 160, 0.06);
+      box-shadow: 0 0 0 1px var(--accent), inset 0 0 20px rgba(0,229,160,0.03);
+    }
+
+    .service-option:checked + .service-label .service-dot {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    .service-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .service-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .service-badge {
+      margin-left: auto;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    .badge-popular { background: rgba(0,229,160,0.1); color: var(--accent); }
+    .badge-free { background: rgba(0,184,255,0.1); color: var(--accent2); }
+
+    /* API Key input */
+    .api-field {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .api-field.visible { display: block; }
+
+    .field-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .field-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 12px;
+      transition: opacity 0.2s;
+    }
+
+    .field-link:hover { opacity: 0.7; }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 13px 48px 13px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,229,160,0.1);
+    }
+
+    .input-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      font-size: 16px;
+      transition: color 0.2s;
+    }
+
+    .input-toggle:hover { color: var(--text); }
+
+    .validate-btn {
+      margin-top: 10px;
+      padding: 9px 18px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .validate-btn:hover {
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    .validate-status {
+      margin-top: 8px;
+      font-size: 13px;
+      display: none;
+    }
+
+    .status-ok { color: var(--accent); display: flex; align-items: center; gap: 6px; }
+    .status-err { color: var(--danger); display: flex; align-items: center; gap: 6px; }
+
+    /* Quality filter */
+    .quality-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .quality-checkbox { display: none; }
+
+    .quality-tag {
+      padding: 7px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--surface2);
+      color: var(--text-muted);
+    }
+
+    .quality-tag:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+    .quality-checkbox:checked + .quality-tag {
+      border-color: var(--accent2);
+      background: rgba(0,184,255,0.08);
+      color: var(--accent2);
+    }
+
+    /* Install button */
+    .install-btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, var(--accent) 0%, #00c980 100%);
+      border: none;
+      border-radius: 14px;
+      color: #000;
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.3px;
+      margin-top: 8px;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.5s ease 0.4s both;
+    }
+
+    .install-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .install-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,229,160,0.3); }
+    .install-btn:hover::before { opacity: 1; }
+    .install-btn:active { transform: translateY(0); }
+
+    .install-btn:disabled {
+      background: var(--surface2);
+      color: var(--text-muted);
+      transform: none;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    /* Copy URL section */
+    .copy-section {
+      margin-top: 16px;
+      animation: fadeUp 0.5s ease 0.5s both;
+    }
+
+    .copy-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .copy-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .copy-url {
+      flex: 1;
+      padding: 11px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-family: 'DM Mono', monospace, 'DM Sans', sans-serif;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: text;
+    }
+
+    .copy-btn {
+      padding: 11px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+      white-space: nowrap;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .copy-btn.copied { border-color: var(--accent); color: var(--accent); }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 48px;
+      color: var(--text-muted);
+      font-size: 12px;
+      animation: fadeUp 0.5s ease 0.6s both;
+    }
+
+    .footer a { color: var(--text-muted); text-decoration: none; }
+    .footer a:hover { color: var(--accent); }
+
+    /* Animations */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Divider */
+    .divider {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12px;
+      margin: 8px 0;
+      position: relative;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+
+    @media (max-width: 480px) {
+      .service-grid { grid-template-columns: 1fr; }
+      .wrapper { padding: 24px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <header class="header">
+      <div class="logo">
+        <div class="logo-icon">🍀</div>
+        <span class="logo-text">DubLuck</span>
+      </div>
+      <p class="tagline">Conteúdo dublado em PT-BR com suporte a Debrid</p>
+    </header>
+
+    <!-- Serviço Debrid -->
+    <div class="card">
+      <div class="card-title"><span></span> Serviço Debrid <span></span></div>
+
+      <div class="service-grid">
+
+        <div>
+          <input type="radio" name="service" id="svc-rd" value="realdebrid" class="service-option" checked />
+          <label for="svc-rd" class="service-label">
+            <span class="service-dot"></span>
+            <span class="service-name">Real-Debrid</span>
+            <span class="service-badge badge-popular">Popular</span>
+          </label>
+        </div>
+
+        <div>
+          <input type="radio" name="service" id="svc-ad" value="alldebrid" class="service-option" />
+          <label for="svc-ad" class="service-label">
+            <span class="service-dot"></span>
+            <span class="service-name">AllDebrid</span>
+          </label>
+        </div>
+
+        <div>
+          <input type="radio" name="service" id="svc-pm" value="premiumize" class="service-option" />
+          <label for="svc-pm" class="service-label">
+            <span class="service-dot"></span>
+            <span class="service-name">Premiumize</span>
+          </label>
+        </div>
+
+        <div>
+          <input type="radio" name="service" id="svc-dl" value="debridlink" class="service-option" />
+          <label for="svc-dl" class="service-label">
+            <span class="service-dot"></span>
+            <span class="service-name">Debrid-Link</span>
+          </label>
+        </div>
+
+        <div>
+          <input type="radio" name="service" id="svc-none" value="none" class="service-option" />
+          <label for="svc-none" class="service-label">
+            <span class="service-dot"></span>
+            <span class="service-name">Sem Debrid</span>
+            <span class="service-badge badge-free">Lento</span>
+          </label>
+        </div>
+
+      </div>
+
+      <!-- API Key input (aparece dinamicamente) -->
+      <div class="api-field visible" id="api-field">
+        <div class="field-label">
+          <span>Chave de API</span>
+          <a href="#" class="field-link" id="api-link" target="_blank" rel="noopener">Obter chave →</a>
+        </div>
+        <div class="input-wrap">
+          <input type="password" id="api-key" placeholder="Cole sua chave de API aqui..." autocomplete="off" />
+          <button class="input-toggle" id="toggle-vis" title="Mostrar/ocultar">👁</button>
+        </div>
+        <button class="validate-btn" id="validate-btn">
+          <span>✓</span> Validar chave
+        </button>
+        <div class="validate-status" id="validate-status"></div>
+      </div>
+    </div>
+
+    <!-- Qualidade -->
+    <div class="card">
+      <div class="card-title"><span></span> Qualidades preferidas <span></span></div>
+      <div class="quality-grid">
+        <input type="checkbox" id="q-4k" value="4K" class="quality-checkbox" checked />
+        <label for="q-4k" class="quality-tag">4K</label>
+
+        <input type="checkbox" id="q-1080" value="1080p" class="quality-checkbox" checked />
+        <label for="q-1080" class="quality-tag">1080p</label>
+
+        <input type="checkbox" id="q-720" value="720p" class="quality-checkbox" checked />
+        <label for="q-720" class="quality-tag">720p</label>
+
+        <input type="checkbox" id="q-480" value="480p" class="quality-checkbox" checked />
+        <label for="q-480" class="quality-tag">480p</label>
+
+        <input type="checkbox" id="q-sd" value="SD" class="quality-checkbox" checked />
+        <label for="q-sd" class="quality-tag">SD</label>
+      </div>
+    </div>
+
+    <!-- Instalar -->
+    <button class="install-btn" id="install-btn">
+      🚀 Instalar no Stremio
+    </button>
+
+    <div class="copy-section">
+      <p class="copy-label">ou adicione manualmente no Stremio</p>
+      <div class="copy-row">
+        <div class="copy-url" id="manifest-url">Gere sua URL configurando acima...</div>
+        <button class="copy-btn" id="copy-btn">Copiar</button>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>DubLuck é um projeto open-source baseado no <a href="https://github.com/fadoaglauss/stremio-brazilian-addon" target="_blank">Mico Leão Dublado</a></p>
+      <p style="margin-top:6px">Nenhum dado é armazenado. Sua chave de API fica apenas na URL.</p>
+    </footer>
+
+  </div>
+
+  <script>
+    const API_LINKS = {
+      realdebrid: 'https://real-debrid.com/apitoken',
+      alldebrid: 'https://alldebrid.com/apikeys/',
+      premiumize: 'https://www.premiumize.me/account',
+      debridlink: 'https://debrid-link.com/webapp/apikey',
+    };
+
+    const BASE_URL = window.location.origin;
+
+    // Elements
+    const serviceRadios = document.querySelectorAll('input[name="service"]');
+    const apiField = document.getElementById('api-field');
+    const apiKeyInput = document.getElementById('api-key');
+    const apiLink = document.getElementById('api-link');
+    const toggleVis = document.getElementById('toggle-vis');
+    const validateBtn = document.getElementById('validate-btn');
+    const validateStatus = document.getElementById('validate-status');
+    const installBtn = document.getElementById('install-btn');
+    const manifestUrl = document.getElementById('manifest-url');
+    const copyBtn = document.getElementById('copy-btn');
+    const qualityCheckboxes = document.querySelectorAll('.quality-checkbox');
+
+    function getSelectedService() {
+      for (const r of serviceRadios) if (r.checked) return r.value;
+      return 'none';
+    }
+
+    function getSelectedQualities() {
+      return [...qualityCheckboxes].filter(c => c.checked).map(c => c.value);
+    }
+
+    function buildConfig() {
+      return {
+        service: getSelectedService(),
+        apiKey: apiKeyInput.value.trim(),
+        qualities: getSelectedQualities(),
+      };
+    }
+
+    function encodeConfig(cfg) {
+      return btoa(JSON.stringify(cfg))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    }
+
+    function updateUrl() {
+      const cfg = buildConfig();
+      const encoded = encodeConfig(cfg);
+      const url = `${BASE_URL}/${encoded}/manifest.json`;
+      manifestUrl.textContent = url;
+      return url;
+    }
+
+    function onServiceChange() {
+      const svc = getSelectedService();
+      if (svc === 'none') {
+        apiField.classList.remove('visible');
+      } else {
+        apiField.classList.add('visible');
+        apiLink.href = API_LINKS[svc] || '#';
+      }
+      validateStatus.style.display = 'none';
+      updateUrl();
+    }
+
+    // Service change
+    serviceRadios.forEach(r => r.addEventListener('change', onServiceChange));
+
+    // API key input
+    apiKeyInput.addEventListener('input', () => {
+      validateStatus.style.display = 'none';
+      updateUrl();
+    });
+
+    // Quality change
+    qualityCheckboxes.forEach(c => c.addEventListener('change', updateUrl));
+
+    // Toggle visibility
+    toggleVis.addEventListener('click', () => {
+      apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
+    });
+
+    // Validate key
+    validateBtn.addEventListener('click', async () => {
+      const svc = getSelectedService();
+      const key = apiKeyInput.value.trim();
+      if (!key) return;
+
+      validateBtn.textContent = 'Validando...';
+      validateBtn.disabled = true;
+      validateStatus.style.display = 'none';
+
+      try {
+        const res = await fetch(`/validate?service=${svc}&apiKey=${encodeURIComponent(key)}`);
+        const data = await res.json();
+
+        validateStatus.style.display = 'flex';
+        if (data.valid) {
+          validateStatus.innerHTML = '<span class="status-ok">✓ Chave válida! Pronto para usar.</span>';
+        } else {
+          validateStatus.innerHTML = '<span class="status-err">✗ Chave inválida. Verifique e tente novamente.</span>';
+        }
+      } catch {
+        validateStatus.style.display = 'flex';
+        validateStatus.innerHTML = '<span class="status-err">✗ Erro ao validar. Tente novamente.</span>';
+      }
+
+      validateBtn.textContent = '✓ Validar chave';
+      validateBtn.disabled = false;
+    });
+
+    // Install
+    installBtn.addEventListener('click', () => {
+      const url = updateUrl();
+      const stremioUrl = url.replace(/^https?:\/\//, 'stremio://');
+      window.location.href = stremioUrl;
+    });
+
+    // Copy
+    copyBtn.addEventListener('click', async () => {
+      const url = manifestUrl.textContent;
+      await navigator.clipboard.writeText(url).catch(() => {});
+      copyBtn.textContent = '✓ Copiado';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copiar';
+        copyBtn.classList.remove('copied');
+      }, 2000);
+    });
+
+    // Init
+    onServiceChange();
+  </script>
+</body>
+</html>
