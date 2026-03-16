@@ -44,8 +44,7 @@ app.get('/:config/stream/:type/:id.json', async (req, res) => {
   console.log(`\n[DubLuck] ▶ ${type}/${id} | debrid=${config.service}`);
 
   try {
-    const rawStreams = await getPtBrStreams(type, id, config.qualities);
-    if (!rawStreams || rawStreams.length === 0) return res.json({ streams: [] });
+const rawStreams = await getPtBrStreams(type, id, config.qualities, config.orionKey || null);
 
     if (config.service === 'none' || !config.apiKey) {
       return res.json({
