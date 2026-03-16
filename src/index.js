@@ -102,14 +102,3 @@ function formatTitle(stream) {
 
 app.listen(PORT, () => console.log(`🍀 DubLuck v2.3 rodando na porta ${PORT}`));
 module.exports = app;
-```
-
-**Ctrl+S** para salvar! Depois manda os 3 comandos no terminal:
-```
-git add .
-```
-```
-git commit -m "DubLuck v2.3 - mais fontes e logo corrigida"
-```
-```
-git push origin HEAD:main --force
