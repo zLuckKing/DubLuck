@@ -52,7 +52,8 @@ async function searchIndexers(query, year) {
             // Aceita se: sem ano no título, ou ano bate, ou é coleção (múltiplos anos)
             if (!years) return true;
             if (years.includes(year)) return true;
-            if (years.length >= 2) return true; // coleção com vários anos
+            if (years.length >= 2) return true; // coleção
+            if (parseInt(years[0]) >= parseInt(year) - 1) return true; // ano próximo
             return false;
           })
           .map(r => ({
