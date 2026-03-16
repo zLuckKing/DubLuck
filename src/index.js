@@ -24,7 +24,7 @@ app.get('/:config/manifest.json', (req, res) => {
   const config = decodeConfig(req.params.config);
   res.json({
     id: 'br.dubluck.stremio',
-    version: '2.3.0',
+    version: '1.0.0',
     name: '🍀 DubLuck',
     description: `Filmes e séries dublados em PT-BR com suporte a ${config.service !== 'none' ? config.service : 'Torrent direto'}.`,
     logo: 'https://raw.githubusercontent.com/twitter/twemoji/master/assets/72x72/1f340.png',
